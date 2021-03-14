@@ -20,6 +20,7 @@ export class DataService {
     this.mostPopularBook = popularBook;
   }
 
+  // todo update to communicate with http service
   getAllReaders(): Reader[] {
     return allReaders;
   }
@@ -29,11 +30,11 @@ export class DataService {
   }
 
   getAllBooks(): Observable<Book[]> {
-    return this.http.get<Book[]>("api/books");
+    return this.http.get<Book[]>("/api/books");
   }
 
   getBookById(id: number): Observable<Book> {
-    return this.http.get<Book>(`api/books/${id}`, {
+    return this.http.get<Book>(`/api/books/${id}`, {
       headers: new HttpHeaders({
         Accept: "application/json",
         Authorization: "my-token",
@@ -42,7 +43,7 @@ export class DataService {
   }
 
   getOldBookById(id: number): Observable<OldBook> {
-    return this.http.get<Book>(`api/books/${id}`).pipe(
+    return this.http.get<Book>(`/api/books/${id}`).pipe(
       map(
         (b) =>
           <OldBook>{
@@ -52,5 +53,29 @@ export class DataService {
       ),
       tap((classicBook) => console.log(classicBook))
     );
+  }
+
+  addBook(newBook: Book): Observable<Book> {
+    return this.http.post<Book>("/api/books", newBook, {
+      headers: new HttpHeaders({
+        "Content-Type": "application/json",
+      }),
+    });
+  }
+
+  updateBook(updatedBook: Book): Observable<void> {
+    return this.http.put<void>(
+      `/api/books/${updatedBook.bookID}`,
+      updatedBook,
+      {
+        headers: new HttpHeaders({
+          "Content-Type": "application/json",
+        }),
+      }
+    );
+  }
+
+  deleteBook(bookId: number): Observable<void> {
+    return this.http.delete<void>(`/api/books/${bookId}`);
   }
 }
